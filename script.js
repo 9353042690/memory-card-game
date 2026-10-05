@@ -17,8 +17,8 @@ function updateScore() {
         "Score: " + score + " | Best Score: " + bestScore;
 }
 
-function shuffle() {
-    cards.sort(() => Math.random() - 0.5);
+function shuffle(array) {
+    return array.sort(() => Math.random() - 0.5);
 }
 
 function createGame() {
@@ -30,10 +30,9 @@ function createGame() {
     score = 0;
     matchedPairs = 0;
 
-    shuffle();
-    updateScore();
+    const shuffledCards = shuffle([...cards]);
 
-    cards.forEach((card) => {
+    shuffledCards.forEach((card) => {
         const button = document.createElement("button");
 
         button.textContent = "❓";
@@ -42,11 +41,15 @@ function createGame() {
         button.style.fontSize = "35px";
         button.style.width = "80px";
         button.style.height = "80px";
+        button.style.margin = "5px";
+        button.style.cursor = "pointer";
 
         button.onclick = () => flipCard(button);
 
         game.appendChild(button);
     });
+
+    updateScore();
 }
 
 function flipCard(button) {
@@ -57,7 +60,7 @@ function flipCard(button) {
 
     button.textContent = button.dataset.card;
 
-    if (!firstCard) {
+    if (firstCard === null) {
         firstCard = button;
         return;
     }
@@ -65,14 +68,17 @@ function flipCard(button) {
     secondCard = button;
     lockBoard = true;
 
+    // Score increases ONLY for a correct match
     if (firstCard.dataset.card === secondCard.dataset.card) {
-    score++;
+
+        score++;
+        matchedPairs++;
 
         firstCard.disabled = true;
         secondCard.disabled = true;
 
-        matchedPairs++;
         resetTurn();
+        updateScore();
 
         if (matchedPairs === 4) {
             gameWon();
@@ -81,21 +87,27 @@ function flipCard(button) {
     } else {
 
         setTimeout(() => {
+
             firstCard.textContent = "❓";
             secondCard.textContent = "❓";
 
             resetTurn();
+
         }, 800);
     }
+}
 
-    updateScore();
+function resetTurn() {
+    firstCard = null;
+    secondCard = null;
+    lockBoard = false;
 }
 
 function gameWon() {
 
     let newBest = false;
 
-    if (bestScore === 0 || score < bestScore) {
+    if (score > Number(bestScore)) {
         bestScore = score;
         localStorage.setItem("bestScore", bestScore);
         newBest = true;
@@ -105,16 +117,17 @@ function gameWon() {
 
     const message = document.createElement("div");
 
-    message.id = "winMessage";
-
     message.innerHTML = `
         <h2>🎉 Congratulations!</h2>
-        <p>You matched all the cards!</p>
-        <p>🎯 Your Score: <b>${score}</b></p>
-        <p>🏆 Best Score: <b>${bestScore}</b></p>
+        <p>You found all 4 pairs!</p>
+        <p>🎯 Score: ${score}</p>
+        <p>🏆 Best Score: ${bestScore}</p>
         ${newBest ? "<p>🌟 NEW BEST SCORE!</p>" : ""}
         <button id="playAgain">🔄 Play Again</button>
     `;
+
+    message.style.textAlign = "center";
+    message.style.marginTop = "20px";
 
     document.body.appendChild(message);
 
@@ -122,12 +135,6 @@ function gameWon() {
         message.remove();
         createGame();
     };
-}
-
-function resetTurn() {
-    firstCard = null;
-    secondCard = null;
-    lockBoard = false;
 }
 
 restartButton.onclick = createGame;
