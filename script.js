@@ -103,15 +103,7 @@ function resetTurn() {
     lockBoard = false;
 }
 
-function gameWon() {
-
-    let newBest = false;
-
-    if (score > Number(bestScore)) {
-        bestScore = score;
-        localStorage.setItem("bestScore", bestScore);
-        newBest = true;
-    }
+function gameWon()
 
     updateScore();
 
@@ -121,7 +113,7 @@ function gameWon() {
         <h2>🎉 Congratulations!</h2>
         <p>You found all 4 pairs!</p>
         <p>🎯 Score: ${score}</p>
-        <p>🏆 Best Score: ${bestScore}</p>
+        
         ${newBest ? "<p>🌟 NEW BEST SCORE!</p>" : ""}
         <button id="playAgain">🔄 Play Again</button>
     `;
