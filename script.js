@@ -23,7 +23,9 @@ function shuffle() {
     cards.sort(() => Math.random() - 0.5);
 }
 
-function createGame() {
+function createGame() 
+    document.getElementById("restart").onclick = createGame;
+{
     game.innerHTML = "";
     firstCard = null;
     secondCard = null;
