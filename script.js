@@ -9,16 +9,14 @@ let lockBoard = false;
 let score = 0;
 let matchedPairs = 0;
 
-let bestScore = Number(localStorage.getItem("bestScore")) || 0;
-
 const game = document.getElementById("game-board");
 const scoreText = document.getElementById("score");
-const bestText = document.getElementById("best");
 const restartButton = document.getElementById("restart");
 
+let bestScore = Number(localStorage.getItem("bestScore")) || 0;
+
 function updateScore() {
-    scoreText.textContent = score;
-    bestText.textContent = bestScore;
+    scoreText.textContent = "Score: " + score;
 }
 
 function shuffle(array) {
@@ -34,16 +32,25 @@ function createGame() {
     score = 0;
     matchedPairs = 0;
 
-    const shuffledCards = shuffle([...cards]);
+    shuffle([...cards]).forEach((emoji) => {
 
-    shuffledCards.forEach((card) => {
         const button = document.createElement("button");
 
-        button.className = "card";
         button.textContent = "❓";
-        button.dataset.card = card;
+        button.dataset.card = emoji;
 
-        button.onclick = () => flipCard(button);
+        button.style.width = "70px";
+        button.style.height = "70px";
+        button.style.fontSize = "30px";
+        button.style.margin = "5px";
+        button.style.background = "#4f46e5";
+        button.style.border = "none";
+        button.style.borderRadius = "10px";
+        button.style.cursor = "pointer";
+
+        button.onclick = function () {
+            flipCard(button);
+        };
 
         game.appendChild(button);
     });
@@ -84,16 +91,20 @@ function flipCard(button) {
         resetTurn();
 
         if (matchedPairs === 4) {
-            gameWon();
+            setTimeout(() => {
+                alert("🎉 Congratulations! You found all 4 pairs!");
+            }, 300);
         }
 
     } else {
 
         setTimeout(() => {
+
             firstCard.textContent = "❓";
             secondCard.textContent = "❓";
 
             resetTurn();
+
         }, 800);
     }
 }
@@ -102,27 +113,6 @@ function resetTurn() {
     firstCard = null;
     secondCard = null;
     lockBoard = false;
-}
-
-function gameWon() {
-    const message = document.createElement("div");
-
-    message.innerHTML = `
-        <h2>🎉 Congratulations!</h2>
-        <p>You found all 4 pairs!</p>
-        <p>🎯 Score: ${score}</p>
-        <button id="playAgain">🔄 Play Again</button>
-    `;
-
-    message.style.textAlign = "center";
-    message.style.marginTop = "20px";
-
-    document.body.appendChild(message);
-
-    document.getElementById("playAgain").onclick = () => {
-        message.remove();
-        createGame();
-    };
 }
 
 restartButton.onclick = createGame;
