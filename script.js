@@ -1,4 +1,7 @@
-const cards = ["🐶", "🐱", "🐭", "🐹", "🐶", "🐱", "🐭", "🐹"];
+const cards = [
+    "🐶", "🐱", "🐭", "🐹",
+    "🐶", "🐱", "🐭", "🐹"
+];
 
 let firstCard = null;
 let secondCard = null;
@@ -6,15 +9,16 @@ let lockBoard = false;
 let score = 0;
 let matchedPairs = 0;
 
-let bestScore = localStorage.getItem("bestScore") || 0;
+let bestScore = Number(localStorage.getItem("bestScore")) || 0;
 
-const game = document.getElementById("game");
+const game = document.getElementById("game-board");
 const scoreText = document.getElementById("score");
+const bestText = document.getElementById("best");
 const restartButton = document.getElementById("restart");
 
 function updateScore() {
-    scoreText.textContent =
-        "Score: " + score + " | Best Score: " + bestScore;
+    scoreText.textContent = score;
+    bestText.textContent = bestScore;
 }
 
 function shuffle(array) {
@@ -35,14 +39,9 @@ function createGame() {
     shuffledCards.forEach((card) => {
         const button = document.createElement("button");
 
+        button.className = "card";
         button.textContent = "❓";
         button.dataset.card = card;
-
-        button.style.fontSize = "35px";
-        button.style.width = "80px";
-        button.style.height = "80px";
-        button.style.margin = "5px";
-        button.style.cursor = "pointer";
 
         button.onclick = () => flipCard(button);
 
@@ -68,7 +67,6 @@ function flipCard(button) {
     secondCard = button;
     lockBoard = true;
 
-    // Score increases ONLY for a correct match
     if (firstCard.dataset.card === secondCard.dataset.card) {
 
         score++;
@@ -77,8 +75,13 @@ function flipCard(button) {
         firstCard.disabled = true;
         secondCard.disabled = true;
 
-        resetTurn();
+        if (score > bestScore) {
+            bestScore = score;
+            localStorage.setItem("bestScore", bestScore);
+        }
+
         updateScore();
+        resetTurn();
 
         if (matchedPairs === 4) {
             gameWon();
@@ -87,12 +90,10 @@ function flipCard(button) {
     } else {
 
         setTimeout(() => {
-
             firstCard.textContent = "❓";
             secondCard.textContent = "❓";
 
             resetTurn();
-
         }, 800);
     }
 }
@@ -103,18 +104,13 @@ function resetTurn() {
     lockBoard = false;
 }
 
-function gameWon()
-
-    updateScore();
-
+function gameWon() {
     const message = document.createElement("div");
 
     message.innerHTML = `
         <h2>🎉 Congratulations!</h2>
         <p>You found all 4 pairs!</p>
         <p>🎯 Score: ${score}</p>
-        
-        ${newBest ? "<p>🌟 NEW BEST SCORE!</p>" : ""}
         <button id="playAgain">🔄 Play Again</button>
     `;
 
