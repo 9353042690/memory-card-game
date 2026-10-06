@@ -1,17 +1,21 @@
 #game-board {
     display: grid;
-    grid-template-columns: repeat(8, 70px);
-    gap: 8px;
+    grid-template-columns: repeat(4, 80px);
+    gap: 12px;
     justify-content: center;
     margin: 20px auto;
 }
 
 .card {
-    width: 70px;
-    height: 70px;
+    width: 80px;
+    height: 80px;
     font-size: 30px;
     background: #4f46e5;
     border: none;
     border-radius: 10px;
     cursor: pointer;
+}
+
+.card:disabled {
+    background: #eeeeee;
 }
